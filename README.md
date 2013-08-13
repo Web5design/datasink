@@ -45,7 +45,7 @@ A suitable version of Weka is unfortunately not bundled with Ubuntu, so run the 
 
 
 
-## Setup option 2: Ubuntu virtual machine via VirtualBox
+## Setup option 2: Ubuntu virtual machine
 
 This option downloads and runs Ubuntu 13.04 64-bit under the VirtualBox virtual machine, incurring some performance penalty but allowing you to evaluate datasink in a completely self-contained, pre-configured environment.  Skip this section if you aren't familiar with virtual machines.
 
@@ -70,7 +70,7 @@ Thanks to [Olivier Grisel](https://github.com/ogrisel/my-linux-devbox) for the o
 
 
 
-## Setup option 3: OS X via MacPorts
+## Setup option 3: OS X
 
 There are several options for installing the prerequisites under OS X.  Pre-built Python distributions such as [Enthought](https://www.enthought.com/products/epd/) contain the necessary Python components and OS X comes bundled with a suitable version of Java.  Advanced users can simply install a binary version of Groovy and Weka from their respective websites, place the Weka JAR file in their `CLASSPATH`, and begin generating ensembles.
 
