@@ -247,7 +247,7 @@ Compare the performance of the Naive Bayes base classifier (0.806) to its bagged
 
 	from glob import glob
 	from pandas import concat
-	from sklearn.metrics import auc_score
+	from sklearn.metrics import roc_auc_score
 
 	df = concat([read_csv(_, compression = 'gzip', index_col = [0, 1]) \
 		for _ in glob('predictions-*.csv.gz')])
