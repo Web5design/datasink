@@ -1,5 +1,4 @@
 # datasink: A Pipeline for Large-Scale Heterogeneous Ensemble Learning
----
 
 Datasink is a customizable pipeline for generating diverse ensembles of heterogeneous classifiers, as well as the accompanying metadata needed for ensemble learning approaches utilizing ensemble diversity for improved performance.  It also fairly evaluates the performance of several ensemble learning methods including greedy selection, enhanced selection [Caruana2004], and stacked generalization (stacking) [Wolpert1992].  Though other tools exist, we are unaware of a similarly modular, scalable pipeline designed for large-scale ensemble learning.
 
@@ -29,19 +28,16 @@ This README details the setup and use of datasink via several examples but is no
 
 
 ## Setup option 1: Ubuntu Linux
----
 
 Ubuntu and other Debian-based Linux distributions use the `apt-get` command for installing packages and their dependencies.  See the [howto](https://help.ubuntu.com/community/AptGet/Howto) or run `man apt-get` for more details.
 
 To install the prerequisites for datasink, run:
 
-	:::text
 	sudo apt-get -y install groovy cython python-numpy python-scipy python-pip
 	sudo pip install -U pandas scikit-learn
 
 A suitable version of Weka is unfortunately not bundled with Ubuntu, so run the following:
 
-	:::text
 	sudo apt-get -y install curl unzip
 	curl -O -L http://prdownloads.sourceforge.net/weka/weka-3-7-9.zip
 	unzip weka-3-7-9.zip
@@ -50,7 +46,6 @@ A suitable version of Weka is unfortunately not bundled with Ubuntu, so run the 
 
 
 ## Setup option 2: Ubuntu virtual machine via VirtualBox
----
 
 This option downloads and runs Ubuntu 13.04 64-bit under the VirtualBox virtual machine, incurring some performance penalty but allowing you to evaluate datasink in a completely self-contained, pre-configured environment.  Skip this section if you aren't familiar with virtual machines.
 
@@ -61,7 +56,6 @@ First install the following:
 
 then run:
 
-	:::text
 	mkdir dvm; cd dvm
 	vagrant init
 	vagrant box add base http://cloud-images.ubuntu.com/vagrant/raring/current/raring-server-cloudimg-amd64-vagrant-disk1.box
@@ -77,7 +71,6 @@ Thanks to [Olivier Grisel](https://github.com/ogrisel/my-linux-devbox) for the o
 
 
 ## Setup option 3: OS X via MacPorts
----
 
 There are several options for installing the prerequisites under OS X.  Pre-built Python distributions such as [Enthought](https://www.enthought.com/products/epd/) contain the necessary Python components and OS X comes bundled with a suitable version of Java.  Advanced users can simply install a binary version of Groovy and Weka from their respective websites, place the Weka JAR file in their `CLASSPATH`, and begin generating ensembles.
 
@@ -89,14 +82,12 @@ Other users may wish to use the MacPorts project to install the prerequisites an
 
 MacPorts downloads the required packages and their dependencies, but must compile from source if binaries are not available for your system; this can take hours for a fresh MacPorts installation as there are several dozen large packages to compile.  Run the following to update MacPorts and install the prerequisites:
 
-	:::text
 	sudo port selfupdate
 	sudo port install groovy py27-cython py27-pandas py27-scikit-learn
 	sudo port select --set python python27
 
 A suitable version of Weka is unfortunately not bundled with MacPorts, so run the following:
 
-	:::text
 	curl -O -L http://prdownloads.sourceforge.net/weka/weka-3-7-9.zip
 	unzip weka-3-7-9.zip
 	sudo cp weka-3-7-9/weka.jar /opt/local/share/java
@@ -104,7 +95,6 @@ A suitable version of Weka is unfortunately not bundled with MacPorts, so run th
 
 
 ## Obtaining the source
----
 
 The latest source code can be obtained by cloning the public git repository using the following from the command line:
 
@@ -116,24 +106,20 @@ This will create a `datasink` subdirectory in your working directory containing 
 
 
 ## Compiling the Cython module
----
 
 Several functions are accelerated by Cython and must first be compiled by running `make` from the git repository directory.
 
 
 
 ## Setting environment variables
----
 
 Java must be told where Weka is located and how much RAM to use by modifying the `CLASSPATH` and `JAVA_OPTS` environment variables.  A simple way to set these variables is to add the following to your shell's login script for Ubuntu:
 
-	:::text
 	export CLASSPATH=$CLASSPATH:/usr/share/java/weka.jar
 	export JAVA_OPTS="-Xmx4g"
 
 or for OS X:
 
-	:::text
 	export CLASSPATH=$CLASSPATH:/opt/local/share/java/weka.jar
 	export JAVA_OPTS="-Xmx4g"
 
@@ -142,7 +128,6 @@ The above is Bash syntax and allows Weka to use up to 4 gigs of RAM; adjust acco
 
 The `groovy` executable must also be somewhere in your search path (and already is if using the Ubuntu or MacPorts instructions above).  If groovy was manually installed, for example under `$HOME/groovy` on a cluster, add the following to your login script:
 
-	:::text
 	export PATH=$PATH:$HOME/groovy/bin
 
 You're finally ready to setup and construct an ensemble!
@@ -150,7 +135,6 @@ You're finally ready to setup and construct an ensemble!
 
 
 ## Walkthrough: Building an ensemble
----
 
 Ensemble generation requires 3 files, ideally inside a self-contained project directory:
 
@@ -160,13 +144,11 @@ Ensemble generation requires 3 files, ideally inside a self-contained project di
 
 To begin, we create a project directory in our home directory and download an example dataset from the command line:
 
-	:::text
 	mkdir ~/diabetes; cd ~/diabetes
 	curl -O http://repository.seasr.org/Datasets/UCI/arff/diabetes.arff
 
 Next we create a `weka.properties` file to configure our pipeline:
 
-	:::text
 	cat > weka.properties << EOF
 	classifiersFilename = classifiers.txt
 	inputFilename = diabetes.arff
@@ -180,7 +162,6 @@ Next we create a `weka.properties` file to configure our pipeline:
 
 Finally, we create `classifiers.txt` containing the Weka classifiers and associated parameters we want included in the ensemble:
 
-	:::text
 	cat > classifiers.txt << EOF
 	weka.classifiers.bayes.NaiveBayes -D
 	weka.classifiers.functions.SGD -F 1
@@ -193,7 +174,6 @@ As specified in the `weka.properties` file, the data is first divided into 10 fo
 
 Before generating the ensemble, we first examine the non-ensemble performance of each base classifier using 10-fold cross validation in Weka.  Several performance metrics are produced by Weka, but datasink focuses on the area under the [receiver operating characteristic (ROC) curve](http://en.wikipedia.org/wiki/Receiver_operating_characteristic) (AUC) since it is well-suited to imbalanced class distributions that often occur with real data.  However, any metric can be computed using the CSV files generated by the analysis scripts.
 
-	:::text
 	weka.classifiers.bayes.NaiveBayes -D
 
 	TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
@@ -208,18 +188,15 @@ Before generating the ensemble, we first examine the non-ensemble performance of
 
 Next we construct an ensemble of 20 [Naive Bayes](http://weka.sourceforge.net/doc/weka/classifiers/bayes/NaiveBayes.html) (NB) and [Logistic Regression](http://weka.sourceforge.net/doc.dev/weka/classifiers/functions/SGD.html) (LR, trained using Stochastic Gradient Descent) base classifiers; recall each classifier type is bagged 10 times.  This takes ~3-4 minutes on a modern 4 core system with 8 gigs of RAM and should decrease linearly with the number of cores:
 
-	:::text
 	cd ~/datasink
 	python generate.py ~/diabetes
 
 Because the code is architected for multicore and distributed environments, many processes are spawned and each writes its output to a unique file.  These files must first be merged:
 
-	:::text
 	python combine.py ~/diabetes
 
 Ensemble methods are then applied:
 
-	:::text
 	python mean.py ~/diabetes
 	0.836
 	python stacking.py ~/diabetes standard
@@ -235,7 +212,6 @@ The output after each script gives the AUC calculated over all cross validation 
 
 Let's add [LogitBoost](http://weka.sourceforge.net/doc/weka/classifiers/meta/LogitBoost.html) to the ensemble, looking first at its base performance in Weka:
 
-	:::text
 	weka.classifiers.meta.LogitBoost
 
 	TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
@@ -244,7 +220,6 @@ Let's add [LogitBoost](http://weka.sourceforge.net/doc/weka/classifiers/meta/Log
 
 We add this classifier to the ensemble by editing `classifiers.txt` and using comment markers (#) as discussed above to exclude the previous classifiers and include LogitBoost, or execute the following command as a shortcut:
 
-	:::text
 	cat > ~/diabetes/classifiers.txt << EOF
 	#weka.classifiers.bayes.NaiveBayes -D
 	#weka.classifiers.functions.SGD -F 1
@@ -253,7 +228,6 @@ We add this classifier to the ensemble by editing `classifiers.txt` and using co
 
 Alternately, leave all lines uncommented to see how the ensemble generation script only produces output for LogitBoost as it recognizes NB and LR are already generated.  Now create the LogitBoost classifiers (~2 mins), combine with the previous NB and LR output, and run the ensemble methods:
 
-	:::text
 	python generate.py ~/diabetes
 	python combine.py ~/diabetes
 	python mean.py ~/diabetes
@@ -272,7 +246,6 @@ Note that the performance of mean-aggregated predictions remains unchanged, whil
 
 Compare the performance of the Naive Bayes base classifier (0.806) to its bagged performance (0.8254) using mean aggregation: Bagging provides a non-trivial boost.  Run `cd ~/diabetes` and try the following under `ipython` to see how this simple aggregation method works.  We first create a pandas DataFrame object indexed by a unique ID and class label for each example:
 
-	:::python
 	from glob import glob
 	from pandas import concat
 	from sklearn.metrics import auc_score
@@ -282,27 +255,23 @@ Compare the performance of the Naive Bayes base classifier (0.806) to its bagged
 
 The probability assigned to the positive class by each resampled classifier is stored across columns, shown here with a number appended to the classifier name for each bagged version:
 
-	:::python
 	print df.columns
 	Index([NaiveBayes.0, NaiveBayes.1, NaiveBayes.2, NaiveBayes.3, NaiveBayes.4, NaiveBayes.5, NaiveBayes.6, NaiveBayes.7, NaiveBayes.8, NaiveBayes.9, SGD.0, SGD.1, SGD.2, SGD.3, SGD.4, SGD.5, SGD.6, SGD.7, SGD.8, SGD.9, LogitBoost.0, LogitBoost.1, LogitBoost.2, LogitBoost.3, LogitBoost.4, LogitBoost.5, LogitBoost.6, LogitBoost.7, LogitBoost.8, LogitBoost.9], dtype=object)
 
 Here we grab the class labels from the index, take the row mean of the first 10 columns corresponding to Naive Bayes, and calculate the AUC:
 
-	:::python
 	labels = df.index.get_level_values(1).values
-	auc_score(labels, df.iloc[:, :10].mean(axis = 1))
+	roc_auc_score(labels, df.iloc[:, :10].mean(axis = 1))
 	0.8254
 
 A similar increase compared to the base classifier is observed for LogitBoost:
 
-	:::python
-	auc_score(labels, df.iloc[:, 20:30].mean(axis = 1))
+	roc_auc_score(labels, df.iloc[:, 20:30].mean(axis = 1))
 	0.8293
 
 but a small dip occurs for Logistic Regression:
 
-	:::python
-	auc_score(labels, df.iloc[:, 10:20].mean(axis = 1))
+	roc_auc_score(labels, df.iloc[:, 10:20].mean(axis = 1))
 	0.8283
 
 Recall the base LR performance is 0.832 which is already quite close to the ensemble's performance.  Resampling the training data with replacement to create diversity excludes approximately one third of the training instances due to chance.  Given its decreased performance, the loss of these training examples is more detrimental to LR than what it gains from ensembling.  However, the dip is relatively small and resampling creates the diversity necessary to increase the overall performance of the ensemble when other classifiers are included.
@@ -313,7 +282,6 @@ Recall the base LR performance is 0.832 which is already quite close to the ense
 
 The advantage of using heterogeneous ensembles is clear when we compare their performance to state-of-the-art homogenous ensemble techniques such as [Random Forests](http://weka.sourceforge.net/doc/weka/classifiers/trees/RandomForest.html).  To maximize performance of the forest, we increase the number of trees to 500 (a parameter that doesn't overfit [Breiman2001]) and reduce the maximum tree depth to prevent overfitting on this small dataset.
 
-	:::text
 	weka.classifiers.trees.RandomForest -I 500 -depth 5
 
 	TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
@@ -328,7 +296,6 @@ Compare the 0.833 AUC of this homogeneous ensemble to the 0.843 achieved above u
 
 Let's see if these trends hold for another dataset:
 
-	:::text
 	mkdir ~/liver; cd ~/liver
 	curl -O http://repository.seasr.org/Datasets/UCI/arff/liver-disorders.arff
 
@@ -375,7 +342,6 @@ This time we use a different set of classifiers and give the performance of a ra
 
 
 ## UCI benchmarks
----
 
 The [UCI machine learning repository](http://archive.ics.uci.edu/ml/) provides datasets for benchmarking machine learning algorithms.  Below is the AUC for several UCI binary classification datasets using 3 classifier types discussed above: NB, LR, and LogitBoost.  *These numbers are provided only for verification purposes*: these datasets are an excellent way to practice ensemble construction and experiment with different settings.  This small ensemble will likely be out-performed by a single well-tuned classifier (often a Random Forest or gradient boosted trees), and for many datasets this best classifier will be out-performed by a larger heterogeneous ensemble.  To get more experience with datasink, try adding new classifiers until the ensemble beats the best classifier for some of these datasets.
 
@@ -406,14 +372,12 @@ Dataset | Instances | Mean | Stacking | Greedy | Enhanced
 
 
 ## Notes
----
 
 If a particular class is extremely uncommon, the bagging process may (by chance) produce training splits that do not contain that class due to sampling with replacement.  Bagging may not be appropriate in these scenarios and can be disabled in the properties file.
 
 
 
 ## Reference: weka.properties
----
 
 Property | Type | Default | Description
 --- | --- | --- | ---
@@ -434,7 +398,6 @@ writeModels | Boolean | false | Save compressed, serialized models for each clas
 
 
 ## Bibliography
----
 
 * Breiman, L. (1996). Bagging Predictors. Machine Learning, 24(2), 123–140. doi:10.1023/A:1018054314350
 * Breiman, L. (2001). Random Forests. Machine Learning, 45(1), 5–32. doi:10.1023/A:1010933404324
