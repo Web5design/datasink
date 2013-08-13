@@ -348,7 +348,7 @@ The [UCI machine learning repository](http://archive.ics.uci.edu/ml/) provides d
 The highest AUC is bolded for each dataset, and ties are broken by preferring the simplest method.  Again, one must perform tests for statistical significance such as those presented in [Demšar2006] to draw sound conclusions about performance differences, and more complex methods often require similarly complex, large, real-world datasets to demonstrate their utility.
 
 Dataset | Instances | Mean | Stacking | Greedy | Enhanced
---- | --- | --- | --- | ---
+--- | --- | --- | --- | --- | ---
 [breast-cancer](http://repository.seasr.org/Datasets/UCI/arff/breast-cancer.arff) | 286 | 0.683 | 0.67 | **0.704** (3) | 0.691 (19)
 [breast-w](http://repository.seasr.org/Datasets/UCI/arff/breast-w.arff) | 699 | 0.993 | 0.992 | **0.993** (5) | 0.993 (17)
 [colic](http://repository.seasr.org/Datasets/UCI/arff/colic.arff) | 368 | 0.872 | **0.883** | 0.874 (9) | 0.875 (25)
