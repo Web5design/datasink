@@ -98,7 +98,6 @@ A suitable version of Weka is unfortunately not bundled with MacPorts, so run th
 
 The latest source code can be obtained by cloning the public git repository using the following from the command line:
 
-	:::text
 	git clone https://github.com/shwhalen/datasink.git
 
 This will create a `datasink` subdirectory in your working directory containing the source code.  The `git` program comes bundled with recent versions of OS X; it can be installed under Ubuntu using `sudo apt-get -y install git`.  Updates can be obtained by running `git pull` from the `datasink` subdirectory.
