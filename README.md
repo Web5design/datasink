@@ -277,9 +277,9 @@ Recall the base LR performance is 0.832 which is already quite close to the ense
 
 
 
-## Heterogeneous vs. homogenous ensembles
+## Heterogeneous vs. homogeneous ensembles
 
-The advantage of using heterogeneous ensembles is clear when we compare their performance to state-of-the-art homogenous ensemble techniques such as [Random Forests](http://weka.sourceforge.net/doc/weka/classifiers/trees/RandomForest.html).  To maximize performance of the forest, we increase the number of trees to 500 (a parameter that doesn't overfit [Breiman2001]) and reduce the maximum tree depth to prevent overfitting on this small dataset.
+The advantage of using heterogeneous ensembles is clear when we compare their performance to state-of-the-art homogeneous ensemble techniques such as [Random Forests](http://weka.sourceforge.net/doc/weka/classifiers/trees/RandomForest.html).  To maximize performance of the forest, we increase the number of trees to 500 (a parameter that doesn't overfit [Breiman2001]) and reduce the maximum tree depth to prevent overfitting on this small dataset.
 
 	weka.classifiers.trees.RandomForest -I 500 -depth 5
 
@@ -342,7 +342,7 @@ This time we use a different set of classifiers and give the performance of a ra
 
 ## UCI benchmarks
 
-The [UCI machine learning repository](http://archive.ics.uci.edu/ml/) provides datasets for benchmarking machine learning algorithms.  Below is the AUC for several UCI binary classification datasets using 3 classifier types discussed above: NB, LR, and LogitBoost.  *These numbers are provided only for verification purposes*: these datasets are an excellent way to practice ensemble construction and experiment with different settings.  This small ensemble will likely be out-performed by a single well-tuned classifier (often a Random Forest or gradient boosted trees), and for many datasets this best classifier will be out-performed by a larger heterogeneous ensemble.  To get more experience with datasink, try adding new classifiers until the ensemble beats the best classifier for some of these datasets.
+The [UCI machine learning repository](http://archive.ics.uci.edu/ml/) provides datasets for benchmarking machine learning algorithms.  Below is the AUC for several UCI binary classification datasets using 3 classifier types discussed above: NB, LR, and LogitBoost.  *These numbers are provided only for verification purposes*: This small ensemble will likely be out-performed by a single well-tuned classifier (often a Random Forest or gradient boosted trees), and for many datasets the best classifier will be out-performed by a larger heterogeneous ensemble.  To get more experience with datasink, try adding new classifiers until the ensemble beats the best classifier for some of these datasets.
 
 The highest AUC is bolded for each dataset, and ties are broken by preferring the simplest method.  Again, one must perform tests for statistical significance such as those presented in [Demšar2006] to draw sound conclusions about performance differences, and more complex methods often require similarly complex, large, real-world datasets to demonstrate their utility.
 
