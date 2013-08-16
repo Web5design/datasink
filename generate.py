@@ -19,8 +19,8 @@
 """
 
 from itertools import product
-from os import environ, getcwd, system
-from os.path import abspath, exists
+from os import environ, system
+from os.path import abspath, dirname, exists
 from sys import argv
 
 from common import load_arff, load_properties
@@ -69,7 +69,7 @@ cluster_cmd = 'rc.py --cores 1 --walltime 06:00:00 --queue small --allocation ac
 classifiers = filter(lambda x: not x.startswith('#'), open(classifiers_fn).readlines())
 classifiers = [_.strip() for _ in classifiers]
 
-working_dir = getcwd()
+working_dir = dirname(abspath(argv[0]))
 n_jobs = 1 if use_cluster else -1
 all_parameters = list(product([working_dir], [project_path], classifiers, fold_values, bag_values))
 Parallel(n_jobs = n_jobs, verbose = 50)(delayed(classify)(parameters) for parameters in all_parameters)
