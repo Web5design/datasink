@@ -30,8 +30,8 @@ path = abspath(argv[1])
 assert exists(path)
 p = load_properties(path)
 fold_count = int(p['foldCount'])
-nested_fold_count = int(p['nestedFoldCount'])
-bag_count = int(p['bagCount'])
+nested_fold_count = max(1, int(p['nestedFoldCount']))
+bag_count = max(1, int(p['bagCount']))
 dirnames = sorted(filter(isdir, glob('%s/weka.classifiers.*' % path)))
 
 for fold in range(fold_count):
