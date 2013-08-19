@@ -25,6 +25,9 @@ from sys import argv
 from pandas import DataFrame, concat, read_csv
 from sklearn.metrics import roc_auc_score
 
+import warnings
+warnings.filterwarnings('ignore', category = DeprecationWarning)
+
 path = abspath(argv[1])
 scores = []
 for dirname in glob('%s/weka.classifiers.*' % path):
@@ -32,4 +35,4 @@ for dirname in glob('%s/weka.classifiers.*' % path):
     df = concat([read_csv(filename, index_col = [0, 1], skiprows = 1, compression = 'gzip') for filename in filenames])
     score = roc_auc_score(df.index.get_level_values('label').values, df.prediction)
     scores.append([dirname.split('/')[-1], score])
-print DataFrame(scores, columns = ['classifier', 'auc']).sort(columns = 'auc', ascending = False)
+print DataFrame(scores, columns = ['classifier', 'auc']).set_index('classifier').sort('auc', ascending = False)
