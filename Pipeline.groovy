@@ -62,6 +62,7 @@ p = new Properties()
 p.load(new FileInputStream(rootDir + "/weka.properties"))
 inputFilename       = p.getProperty("inputFilename").trim()
 workingDir          = rootDir + "/" + p.getProperty("workingDir", ".").trim()
+idAttribute         = p.getProperty("idAttribute", "").trim()
 classAttribute      = p.getProperty("classAttribute").trim()
 predictClassValue   = p.getProperty("predictClassValue").trim()
 balanceTraining     = Boolean.valueOf(p.getProperty("balanceTraining", "true"))
@@ -85,10 +86,13 @@ assert predictClassIndex != -1
 printf "[%s] %s, generating probabilities for class %s (index %d)\n", shortClassifierName, data.attribute(classAttribute), predictClassValue, predictClassIndex
 
 // add ids
-idFilter = new AddID()
-idFilter.setIDIndex("last")
-idFilter.setInputFormat(data)
-data = Filter.useFilter(data, idFilter)
+if (idAttribute == "") {
+    idAttribute = "ID"
+    idFilter = new AddID()
+    idFilter.setIDIndex("last")
+    idFilter.setInputFormat(data)
+    data = Filter.useFilter(data, idFilter)
+}
 
 // generate folds
 if (foldAttribute != "") {
@@ -138,10 +142,10 @@ removeFilter = new Remove()
 if (foldAttribute != "") {
     removeIndices = new int[2]
     removeIndices[0] = data.attribute(foldAttribute).index()
-    removeIndices[1] = data.attribute("ID").index()
+    removeIndices[1] = data.attribute(idAttribute).index()
 } else {
     removeIndices = new int[1]
-    removeIndices[0] = data.attribute("ID").index()
+    removeIndices[0] = data.attribute(idAttribute).index()
 }
 removeFilter.setAttributeIndicesArray(removeIndices)
 filteredClassifier = new FilteredClassifier()
@@ -171,7 +175,7 @@ header = sprintf "# %s@%s %.2f minutes %s\n", System.getProperty("user.name"), j
 writer.write(header)
 writer.write("id,label,prediction,fold,bag,classifier\n")
 for (instance in test) {
-    id = (int) instance.value(test.attribute("ID"))
+    id = (int) instance.value(test.attribute(idAttribute))
     label = (instance.stringValue(instance.classAttribute()).equals(predictClassValue)) ? 1 : 0
     prediction = filteredClassifier.distributionForInstance(instance)[predictClassIndex]
     row = sprintf "%s,%s,%f,%s,%s,%s\n", id, label, prediction, currentFold, currentBag, shortClassifierName
@@ -217,7 +221,7 @@ for (currentNestedFold in 0..nestedFoldCount - 1) {
     writer.write(header)
     writer.write("id,label,prediction,fold,nested_fold,bag,classifier\n")
     for (instance in nestedTest) {
-        id = (int) instance.value(nestedTest.attribute("ID"))
+        id = (int) instance.value(nestedTest.attribute(idAttribute))
         label = (instance.stringValue(instance.classAttribute()).equals(predictClassValue)) ? 1 : 0
         prediction = filteredClassifier.distributionForInstance(instance)[predictClassIndex]
         row = sprintf "%s,%s,%f,%s,%s,%s,%s\n", id, label, prediction, currentFold, currentNestedFold, currentBag, shortClassifierName
